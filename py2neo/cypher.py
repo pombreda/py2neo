@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2011-2013, Nigel Small
+# Copyright 2011-2014, Nigel Small
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import json
 
 from .neo4j import DEFAULT_URI, CypherQuery, CypherError, ServiceRoot, Resource, _hydrated
 from .util import deprecated, Record
-from .packages.httpstream import URI
+from .packages.urimagic import URI
 
 
 @deprecated("The cypher module is deprecated, use "

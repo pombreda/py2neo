@@ -1,7 +1,7 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2011-2013, Nigel Small
+# Copyright 2011-2014, Nigel Small
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -244,10 +244,11 @@ class TestUniqueRelationshipCreation(unittest.TestCase):
         self.batch.clear()
         self.batch.get_or_create_path(alice, "KNOWS", bob)
         try:
-            path, = self.batch.submit()
+            self.batch.submit()
+        except neo4j.BatchError as err:
+            assert err.__class__.__name__ == "UniquePathNotUniqueException"
+        else:
             assert False
-        except neo4j.BatchError:
-            assert True
 
     def test_can_create_relationship_and_start_node(self):
         self.batch.create({"name": "Bob"})
@@ -429,33 +430,6 @@ class TestIndexedNodeCreation(unittest.TestCase):
         # done
         self.recycling = [alice, bob]
 
-    def test_can_create_uniquely_indexed_node_or_fail(self):
-        try:
-            # create Alice
-            alice_props = {"name": "Alice Smith"}
-            self.batch.create_indexed_node_or_fail(self.people, "surname", "Smith", alice_props)
-            alice, = self.batch.submit()
-            assert isinstance(alice, neo4j.Node)
-            assert alice.get_properties() == alice_props
-            self.batch.clear()
-            # create Bob
-            try:
-                bob_props = {"name": "Bob Smith"}
-                self.batch.create_indexed_node_or_fail(self.people, "surname", "Smith", bob_props)
-                self.batch.run()
-                assert False
-            except neo4j.BatchError as err:
-                assert True
-            # check entries
-            smiths = self.people.get("surname", "Smith")
-            assert len(smiths) == 1
-            assert alice in smiths
-            # done
-            self.recycling = [alice]
-        except NotImplementedError:
-            # uniqueness mode `create_or_fail` not available in server version
-            assert True
-
 
 class TestIndexedNodeAddition(unittest.TestCase):
 
@@ -507,20 +481,6 @@ class TestIndexedNodeAddition(unittest.TestCase):
         # done
         self.recycling = [alice, bob]
 
-    def test_can_add_nodes_or_fail(self):
-        alice, bob = self.graph_db.create({"name": "Alice Smith"}, {"name": "Bob Smith"})
-        try:
-            self.batch.add_indexed_node_or_fail(self.people, "surname", "Smith", alice)
-            self.batch.add_indexed_node_or_fail(self.people, "surname", "Smith", bob)
-            try:
-                self.batch.run()
-                assert False
-            except neo4j.BatchError as err:
-                assert True
-        except NotImplementedError:
-            pass
-        self.recycling = [alice, bob]
-
 
 class TestIndexedRelationshipCreation(unittest.TestCase):
 
@@ -558,18 +518,6 @@ class TestIndexedRelationshipCreation(unittest.TestCase):
         assert isinstance(rels[1], neo4j.Relationship)
         assert rels[0] == rels[1]
         self.recycling = rels
-
-    def test_can_create_uniquely_indexed_relationship_or_fail(self):
-        try:
-            self.batch.create_indexed_relationship_or_fail(self.friendships, "friends", "alice_&_bob", self.alice, "KNOWS", self.bob)
-            self.batch.create_indexed_relationship_or_fail(self.friendships, "friends", "alice_&_bob", self.alice, "KNOWS", self.bob)
-            try:
-                self.batch.run()
-                assert False
-            except neo4j.BatchError as err:
-                assert True
-        except NotImplementedError:
-            pass
 
 
 class TestIndexedRelationshipAddition(unittest.TestCase):
@@ -619,20 +567,6 @@ class TestIndexedRelationshipAddition(unittest.TestCase):
         assert len(entries) == 1
         assert ab1 in entries
         # done
-        self.recycling = [ab1, ab2, alice, bob]
-
-    def test_can_add_relationships_or_fail(self):
-        alice, bob, ab1, ab2 = self.graph_db.create({"name": "Alice"}, {"name": "Bob"}, (0, "KNOWS", 1), (0, "KNOWS", 1))
-        try:
-            self.batch.add_indexed_relationship_or_fail(self.friendships, "friends", "alice_&_bob", ab1)
-            self.batch.add_indexed_relationship_or_fail(self.friendships, "friends", "alice_&_bob", ab2)
-            try:
-                self.batch.run()
-                assert False
-            except neo4j.BatchError:
-                assert True
-        except NotImplementedError:
-            pass
         self.recycling = [ab1, ab2, alice, bob]
 
 

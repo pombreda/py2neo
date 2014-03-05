@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2011-2013, Nigel Small
+# Copyright 2011-2014, Nigel Small
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -146,27 +146,33 @@ def is_collection(obj):
 has_all = lambda iterable, items: all(item in iterable for item in items)
 
 
-def ustr(s, encoding="utf-8"):
-    """ Python 2 and 3 compatible helper for casting
-    Unicode strings.
-    """
-    try:
-        unicode
-    except NameError:
-        return str(s)
-    if isinstance(s, str):
-        return s.decode(encoding)
-    else:
-        return unicode(s)
+try:
+    unicode
+except NameError:
+    # Python 3
+    def ustr(s, encoding="utf-8"):
+        if isinstance(s, str):
+            return s
+        try:
+            return s.decode(encoding)
+        except AttributeError:
+            return str(s)
+else:
+    # Python 2
+    def ustr(s, encoding="utf-8"):
+        if isinstance(s, str):
+            return s.decode(encoding)
+        else:
+            return unicode(s)
 
 
 def pendulate(collection):
     count = len(collection)
     for i in range(count):
         if i % 2 == 0:
-            index = i / 2
+            index = i // 2
         else:
-            index = count - ((i + 1) / 2)
+            index = count - ((i + 1) // 2)
         yield index, collection[index]
 
 
