@@ -15,17 +15,13 @@ Contents
    :maxdepth: 2
 
    install
-   fundamentals
-   graphs_nodes_relationships
-   paths
-   schema
-   indexes
-   batches
+   graph
+   property_containers
+   paths_relationships
    cypher
-   ogm
-   geoff
-   calendar
-   neotool
-   deprecated_features
+   schema
+   batch
+   legacy
+   cli
    cookbook
-   neomodel
+   extensions

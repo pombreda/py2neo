@@ -1,0 +1,8 @@
+datadiff
+logutils
+mock
+pyflakes
+pytest
+pytest-cov
+pytest-cache
+pytest-capturelog

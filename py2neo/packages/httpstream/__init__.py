@@ -16,8 +16,10 @@
 # limitations under the License.
 
 
-"""
-HTTPStream
+""" HTTPStream is an HTTP client library for Python that wraps the
+standard library HTTP client with a convenient resource-based interface
+and also provides support for incremental JSON document retrieval and
+RFC 6570 URI Templates.
 """
 
 
@@ -25,7 +27,8 @@ __author__ = "Nigel Small"
 __copyright__ = "2013-2014, Nigel Small"
 __email__ = "nigel@nigelsmall.com"
 __license__ = "Apache License, Version 2.0"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 
 from .http import *
+from .watch import watch
